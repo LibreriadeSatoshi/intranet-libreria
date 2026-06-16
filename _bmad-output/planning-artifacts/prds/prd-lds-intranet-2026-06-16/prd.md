@@ -12,7 +12,7 @@ epic: ENG-271
 
 ## 0. Document Purpose
 
-This PRD is for Ifuensan and the Librería de Satoshi (LdS) dev team. It defines **v1** of the LdS intranet: the private workflow that takes a person from "I want to teach" through profile creation, course submission, Operations approval, and handoff of an approved course into Moodle. It is the source of truth for the **ENG-271** epic.
+This PRD is for brería de Satoshi dev team. It defines **v1** of the intranet: the private workflow that takes a person from "I want to teach" through profile creation, course submission, Operations approval, and handoff of an approved course into Moodle. It is the source of truth for the **ENG-271** epic.
 
 It is built on the existing `docs/` product spec (overview, roadmap, risks, 10 per-story files, and the PA/PB/PC/P101 platform track) — this PRD consolidates and reconciles that material rather than replacing it; the per-story files remain the detailed working notes. Vocabulary is anchored in the Glossary (§3) and must be used verbatim downstream. Features are grouped (§4) with globally-numbered functional requirements (FR-N) nested under them. Cross-cutting non-functional requirements live in §6, integrations in §7. Inferences I made are tagged `[ASSUMPTION]` inline and indexed in §10; genuinely undecided items are in §9 Open Questions. Technical "how" (tech stack, mechanism options, existing loader internals) is deliberately kept out of this PRD and lives in `addendum.md`.
 
@@ -22,7 +22,7 @@ LdS needs to grow its catalog — the immediate goal is onboarding **~50 new cou
 
 The LdS intranet inverts that. It is a **standalone application that owns the course-submission lifecycle end to end** — from a person deciding to teach, through a guided wizard, drafts, and an Operations-led approval, to the moment an approved course is handed off and built in Moodle. Moodle stops being the container of the process and becomes its final destination: where published content lives and where students learn. After handoff, the intranet keeps the record as history — the foundation for future analytics.
 
-This is the first slice of a larger intranet with **public and private fronts**. v1 delivers the private front (the workflow above). The public front (instructor profiles, course landing pages) and additional capabilities will come later, designed once the core lifecycle is proven. The intent is one smooth procedure that makes it easy for instructors to create a course while capturing, outside of Moodle, everything the Operations and Marketing teams need.
+This is the first slice of a larger intranet with **public and private fronts** connected. v1 delivers the private front (the workflow above). The public front (instructor profiles, course landing pages) and additional capabilities will come later, designed once the core lifecycle is proven. The intent is one smooth procedure that makes it easy for instructors to create a course while capturing, outside of Moodle, everything the Operations and Marketing teams need.
 
 ## 2. Target User
 
@@ -209,7 +209,7 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 ## 8. Out of Scope (v1) / Future
 
 - Public front: instructor profiles, course landing pages, featured courses, exports (story 08).
-- Full marketing-promotion automation and instructor promo kits (stories 06b, 07).
+- Full marketing-promotion automation and instructor promo kits (stories 06b, 07, owner Aria).
 - Teacher help/reference documentation (story 09 — stub, owner: Ivan Fuentes).
 - Multi-draft + fine-grained autosave (FR-21).
 - Student-facing intranet surfaces; Nostr in the intranet IdP.

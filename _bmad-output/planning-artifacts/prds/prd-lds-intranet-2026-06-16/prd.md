@@ -12,7 +12,7 @@ epic: ENG-271
 
 ## 0. Document Purpose
 
-This PRD is for brería de Satoshi dev team. It defines **v1** of the intranet: the private workflow that takes a person from "I want to teach" through profile creation, course submission, Operations approval, and handoff of an approved course into Moodle. It is the source of truth for the **ENG-271** epic.
+This PRD is for Librería de Satoshi dev team. It defines **v1** of the intranet: the private workflow that takes a person from "I want to teach" through profile creation, course submission, Operations approval, and handoff of an approved course into Moodle. It is the source of truth for the **ENG-271** epic.
 
 It is built on the existing `docs/` product spec (overview, roadmap, risks, 10 per-story files, and the PA/PB/PC/P101 platform track) — this PRD consolidates and reconciles that material rather than replacing it; the per-story files remain the detailed working notes. Vocabulary is anchored in the Glossary (§3) and must be used verbatim downstream. Features are grouped (§4) with globally-numbered functional requirements (FR-N) nested under them. Cross-cutting non-functional requirements live in §6, integrations in §7. Inferences I made are tagged `[ASSUMPTION]` inline and indexed in §10; genuinely undecided items are in §9 Open Questions. Technical "how" (tech stack, mechanism options, existing loader internals) is deliberately kept out of this PRD and lives in `addendum.md`.
 

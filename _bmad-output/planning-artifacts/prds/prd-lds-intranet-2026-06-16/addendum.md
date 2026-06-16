@@ -9,13 +9,15 @@ Technical depth, mechanism options, and source-doc detail that informs downstrea
 - **Course build:** `moodle-course-loader` (Python). Existing, proven machinery: `PlanBCourseBuilder` + `planb_source` — parses semi-structured Markdown (h1 → Parts, h2 → Chapters), creates Moodle sections/pages, uploads assets, renders HTML, embeds video. Current web-service coverage: `core_course_*`, file upload, set course image. **Missing:** user/role/enrolment functions (added by platform P101).
 - **YAML note:** The content contract is the Markdown **COURSE_MASTER_PLAN**, *not* YAML emitted by the intranet. The loader generates internal YAML from the Plan using the Claude API.
 
-## B. Handoff mechanism — the two options to reconcile (OQ-1)
+## B. Handoff mechanism — DECIDED (OQ-1, 2026-06-16)
 
-The source docs describe two architectures as if one:
+The source docs described two architectures as if one:
 1. **Story 05:** PR merge → **GitHub Action** → Moodle (instantaneous automation).
-2. **Story 06 / PB:** COURSE_MASTER_PLAN reference → **Sheet** → **batch loader** run → Moodle (asynchronous, not instantaneous).
+2. **Story 06 / PB:** COURSE_MASTER_PLAN reference → **Sheet** → **batch loader** run → Moodle (asynchronous).
 
-These imply different latency, error-handling, and state-machine designs. Architecture must pick one authoritative path (or a defined hybrid: merge enqueues; batch builds). FR-33/FR-34 encode the requirement; the choice is OQ-1.
+**Decision (the chosen hybrid):** **PR merge triggers the build automatically** (mechanism 1 is authoritative as the *trigger*); the build itself may run asynchronously/queued (absorbing mechanism 2's batch nature) — but no manual Sheet step is the canonical path. The intranet records the handoff event and notifies Operations on merge; the loader builds in Moodle hidden; the instructor completes setup in Moodle; a final validation happens in Moodle before students see it. See PRD FR-33/FR-34/FR-37a.
+
+**Still for architecture:** the detailed sequence/state machine, queue vs. synchronous build, error/retry, and idempotency (PRD FR-36). The *trigger* and *ownership boundaries* are no longer open; the *internal orchestration* is (tied to OQ-6 spike).
 
 ## C. Artifact generation pipeline (OQ-3)
 

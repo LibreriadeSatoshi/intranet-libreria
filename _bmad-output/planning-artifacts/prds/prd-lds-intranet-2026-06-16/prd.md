@@ -1,6 +1,6 @@
 ---
 title: lds-intranet — Instructor Onboarding & Course Submission
-status: draft
+status: final
 created: 2026-06-16
 updated: 2026-06-16
 epic: ENG-271
@@ -14,13 +14,20 @@ epic: ENG-271
 
 This PRD is for Librería de Satoshi dev team. It defines **v1** of the intranet: the private workflow that takes a person from "I want to teach" through profile creation, course submission, Operations approval, and handoff of an approved course into Moodle. It is the source of truth for the **ENG-271** epic.
 
-It is built on the existing `docs/` product spec (overview, roadmap, risks, 10 per-story files, and the PA/PB/PC/P101 platform track) — this PRD consolidates and reconciles that material rather than replacing it; the per-story files remain the detailed working notes. Vocabulary is anchored in the Glossary (§3) and must be used verbatim downstream. Features are grouped (§4) with globally-numbered functional requirements (FR-N) nested under them. Cross-cutting non-functional requirements live in §6, integrations in §7. Inferences I made are tagged `[ASSUMPTION]` inline and indexed in §10; genuinely undecided items are in §9 Open Questions. Technical "how" (tech stack, mechanism options, existing loader internals) is deliberately kept out of this PRD and lives in `addendum.md`.
+It is built on the existing `docs/` product spec (overview, roadmap, risks, 10 per-story files, and the PA/PB/PC/P101 platform track) — this PRD consolidates and reconciles that material rather than replacing it; the per-story files remain the detailed working notes. Vocabulary is anchored in the Glossary (§3) and must be used verbatim downstream. Features are grouped (§4) with globally-numbered functional requirements (FR-N) nested under them. Cross-cutting non-functional requirements live in §6, integrations in §7. Inferences I made are tagged `[ASSUMPTION]` inline and indexed in §10; genuinely undecided items are in §9 Open Questions. Technical "how" (tech stack, mechanism options, existing loader internals) is deliberately kept out of this PRD and lives in `addendum.md`. **Per-FR acceptance criteria are intentionally not in this PRD** — they are produced downstream by `bmad-create-epics-and-stories`, where each FR becomes one or more stories with testable AC.
 
 ## 1. Vision
 
 LdS needs to grow its catalog — the immediate goal is onboarding **~50 new courses** within roughly **3 months**. Today there is no clean path for an instructor to propose a course and for Operations to capture everything they need; the process leans on Moodle, which was never meant to be the intake or approval surface.
 
 The LdS intranet inverts that. It is a **standalone application that owns the course-submission lifecycle end to end** — from a person deciding to teach, through a guided wizard, drafts, and an Operations-led approval, to the moment an approved course is handed off and built in Moodle. Moodle stops being the container of the process and becomes its final destination: where published content lives and where students learn. After handoff, the intranet keeps the record as history — the foundation for future analytics.
+
+```
+BEFORE:  Moodle  ─ contains the whole hidden submission/approval process
+NOW:     Intranet (source of truth: intake · drafts · approval) ──handoff──▶ Moodle (destination: live course)
+```
+
+This inversion is the core architectural decision: it lets the intake and approval UX evolve independently of Moodle, keeps Moodle a clean execution layer, and makes the intranet the data foundation for the future public front and analytics. A direct consequence: a draft is an **intranet-owned entity**, no longer a hidden Moodle course.
 
 This is the first slice of a larger intranet with **public and private fronts** connected. v1 delivers the private front (the workflow above). The public front (instructor profiles, course landing pages) and additional capabilities will come later, designed once the core lifecycle is proven. The intent is one smooth procedure that makes it easy for instructors to create a course while capturing, outside of Moodle, everything the Operations and Marketing teams need.
 
@@ -108,13 +115,29 @@ FRs are globally numbered and stable. **[v1]** = in the 3-month skeleton; **[lat
 
 Full federated identity in v1 (2 developers dedicated). One canonical identity per person; three login methods.
 
-- **FR-1** [v1] The intranet must authenticate users via an identity provider supporting three methods — local username/password, Google, and GitHub — with the user choosing the method.
+- **FR-1** [v1] The intranet must authenticate users via an identity provider supporting three methods — local username/password, Google, and GitHub — with the user choosing the method. *(Deliberate decision: full federation in v1, not a GitHub-only pilot — see decision log; affordable because 2 developers are dedicated to the identity work.)*
 - **FR-2** [v1] All three methods for the same person must resolve to a **single canonical user identity**; a user who later signs in via a different method must map to the same identity (account linking).
+- **FR-2a** [v1] The system must handle the **existing-student-becomes-teacher** friction case: when an existing Moodle student logs into the intranet to teach and their identifiers do not match across systems, the intranet must define a linking strategy and a **fallback** path (rather than silently creating a duplicate identity). *(Mechanism → OQ-4.)*
 - **FR-3** [v1] On first successful sign-in, the intranet must create a user record and route the user into onboarding (profile wizard) or their dashboard as appropriate.
 - **FR-4** [v1] The intranet must define and enforce its **own roles** — instructor, reviewer/Ops, marketing, admin — independent of Moodle's roles. (v1 exercises instructor + reviewer/Ops primarily.)
 - **FR-5** [v1] Authentication must function independently of Moodle availability (intranet login does not depend on Moodle being up).
 - **FR-6** [v1] The system must reconcile **GitHub identity** (used for PR authorship/approval in §4.5) with the canonical user identity, so PR actions map to the right intranet user. *(See OQ-4.)*
 - **FR-7** [later] Migrate existing instructors to the canonical identity. Nostr remains a Moodle-only student login and is **not** part of the intranet IdP.
+- **FR-7a** [v1] The intranet must enforce role-based access per the matrix below (least-privilege).
+
+**Role × capability matrix (v1):**
+
+| Capability | Instructor | Reviewer/Ops | Marketing | Admin |
+|---|---|---|---|---|
+| Create/edit own profile & submissions | ✓ | — | — | ✓ |
+| See **own** drafts/submissions | ✓ | — | — | ✓ |
+| See **all** submissions | — | ✓ | — | ✓ |
+| Review / approve / reject (merge PR) | — | ✓ | — | ✓ |
+| Assign Moodle category on approval | — | ✓ | — | ✓ |
+| Access MKT_BRIEFING | — | ✓ | ✓ *(later)* | ✓ |
+| Manage roles / config | — | — | — | ✓ |
+
+*v1 actively exercises Instructor + Reviewer/Ops + Admin; Marketing capabilities are mostly `[later]` (§4.8).*
 
 ### 4.2 Entry Point & Teacher Profile *(stories 01, 02)*
 
@@ -130,6 +153,7 @@ Full federated identity in v1 (2 developers dedicated). One canonical identity p
 - **FR-14** [v1] For **cohort-based** courses, the flow must additionally capture: selection-process option, start date, end date, class count, class recurrence, time, and time zone. For **MOOC**, it must capture language selection. *(Conditional on type.)*
 - **FR-15** [v1] The flow must capture a **content breakdown per class**: class number/title, topics, objectives, activities (quiz/exercises), and source materials.
 - **FR-16** [v1] The flow must capture presentation video(s) for social media and the content-ownership / open-source licensing agreement.
+- **FR-16a** [v1] The system must define how **assets** (presentation videos, source materials, images) are handled: accepted types, size/count limits, where they are stored, and how their references survive the submission → GitHub-Markdown → Moodle path (FR-17a) so the loader can resolve them at build time. `[ASSUMPTION]` exact limits TBD with the team.
 - **FR-17** [v1] On submission, the system must produce a **review-ready package** (Markdown) structured for the GitHub PR workflow (§4.5), and this package must be the source for the MKT_BRIEFING and COURSE_MASTER_PLAN. *(Single point of generation — see OQ-3.)*
 - **FR-17a** [v1] After submission, **course content is edited as Markdown in the `courses` repo (GitHub) by the instructor** — the intranet's captured course content becomes **read-only** at that point. The intranet retains the record but is no longer the content-editing surface. *(Resolves OQ-2; content-ownership lifecycle: intranet wizard/draft → GitHub Markdown after submit → Moodle after publish.)*
 
@@ -139,14 +163,26 @@ Full federated identity in v1 (2 developers dedicated). One canonical identity p
 - **FR-19** [v1] A draft must not enter review until **explicitly submitted**.
 - **FR-20** [v1] The dashboard must list a user's draft(s) with status and a "Continue" action.
 - **FR-21** [later] **Multiple simultaneous drafts** per user and fine-grained per-step autosave. *(v1 supports at least single-draft save/resume; multi-draft deferred.)* `[ASSUMPTION]`
-- **FR-22** [later] Preserve abandoned-draft state for funnel/abandonment analytics.
+- **FR-22** [v1] The system must **capture lifecycle events with timestamps** from day one — wizard started, step reached, submitted, changes-requested, approved, published, rejected — so the §5 metrics (SM-2/3/4, CM-3) are measurable. (Full abandonment-analytics tooling and dashboards are `[later]`; raw event capture is v1.) *(Promoted from `[later]` per quality review — NFR-2 promises an analytics foundation that needs the data captured now.)*
 
 ### 4.5 Approval via GitHub PR *(story 05)*
 
+**Canonical submission status lifecycle** (used verbatim everywhere — §2.3, §4, §9):
+
+| Status | Meaning | GitHub PR state | Transitions to |
+|---|---|---|---|
+| `draft` | In the wizard, not submitted | (no PR yet) | `submitted` |
+| `submitted` | Submitted, under review | PR open | `changes-requested`, `approved`, `rejected` |
+| `changes-requested` | Reviewer asked for edits | PR open + changes requested | `submitted` (on re-push) |
+| `approved` | Reviewer merged; handoff pending | PR merged | `published` |
+| `published` | Built in Moodle (hidden), Moodle link recorded | PR merged | (terminal — content now in Moodle) |
+| `rejected` | Reviewer closed without merging | PR closed unmerged | `submitted` (only via a new submission) |
+
 - **FR-23** [v1] All submissions must live as Pull Requests in a single **`courses` repo**; submitting a course opens a PR containing the course package as Markdown.
-- **FR-24** [v1] Reviewer/Ops must be able to **approve** (merge), **request changes** (with a required comment), or **reject** (close) a submission via the PR.
-- **FR-25** [v1] Pushing revisions to an existing submission must re-enter review on the **same** submission (no new submission created).
-- **FR-26** [v1] Submission status in the intranet must stay in sync with the PR state (open / changes-requested / approved-merged / closed).
+- **FR-24** [v1] Reviewer/Ops must be able to **approve** (merge → `approved`), **request changes** (`changes-requested`, with a required comment), or **reject** (close unmerged → `rejected`) a submission via the PR.
+- **FR-24a** [v1] On `rejected`, the instructor must be **notified with the reviewer's reason** (§4.7), and the submission must remain visible (read-only) in their dashboard. Re-attempting requires a **new submission**; v1 does not reopen a rejected submission. `[ASSUMPTION]`
+- **FR-25** [v1] Pushing revisions to a non-rejected submission must re-enter review on the **same** submission (`changes-requested` → `submitted`), creating no new submission.
+- **FR-26** [v1] The intranet's submission status must stay in sync with the PR state, mapping per the lifecycle table above.
 - **FR-27** [v1] Every review action must notify the instructor (via §4.7). Reviewers must comment when requesting changes or rejecting.
 - **FR-28** [v1] Category / cohort / shortname metadata needed for the Moodle build must travel with the submission (companion file or in the package — see OQ-5).
 
@@ -156,6 +192,7 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 
 - **FR-29** [v1] On approval, the system must generate the **COURSE_MASTER_PLAN** (loader input) and **MKT_BRIEFING** (marketing input) from the submission package.
 - **FR-30** [v1] The system must hand the COURSE_MASTER_PLAN to the **loader**, which builds the course structure in Moodle in a **"hidden from students"** state.
+- **FR-30a** [v1] The built course must be placed in the **Moodle category assigned by the reviewer** during approval (the reviewer-selected category travels with the submission per FR-28).
 - **FR-31** [v1] On publish, the instructor must be assigned the appropriate **Teacher role and enrolment** in the Moodle course (platform P101).
 - **FR-32** [v1] On successful build, the **Moodle link** must be written back to the intranet and the submission status set to `published`.
 - **FR-33** [v1] The handoff must follow this authoritative sequence (resolves OQ-1): **PR merge triggers the build automatically**; before/at handoff the intranet **records the handoff event and notifies Operations** (§4.7); the loader builds the course in Moodle in a **"hidden from students"** state; the **instructor completes the course setup in Moodle**; a **final validation is performed in Moodle** before the course is opened to students. The intranet's responsibility ends at `published` (built + Moodle link recorded, hidden); making the course student-visible happens in Moodle, out of intranet scope.
@@ -229,7 +266,7 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 ### Open — deferred to architecture/solutioning (owner: dev team / `bmad-create-architecture`)
 
 - **OQ-3 Artifact generation point.** Where is the course package / COURSE_MASTER_PLAN / MKT_BRIEFING generated — in the wizard, at approval, or inside the loader? FR-17/FR-29 assume a single point; pin it. *Revisit: at architecture, before building §4.6.*
-- **OQ-4 GitHub ↔ canonical identity mapping.** With full federation in v1, PR authorship is GitHub-based but the canonical identity may have signed in via Google/local. How are they linked (FR-6)? GPG-signed commits sharpen this. *Revisit: at architecture, before integrating §4.1 + §4.5.*
+- **OQ-4 GitHub ↔ canonical identity mapping (build-blocking).** With full federation in v1, PR authorship is GitHub-based but the canonical identity may have signed in via Google/local. How are they linked (FR-6), and how is the existing-student→teacher fallback (FR-2a) handled? GPG-signed commits sharpen this. *Revisit: at architecture, **before** building §4.1 + §4.5 — FR-2a/FR-6 are v1 but unbuildable until this is decided.*
 - **OQ-5 Submission metadata format.** Category/cohort/shortname as a companion `.yml` or inline in the Markdown package (FR-28)? *Revisit: at architecture, low stakes.*
 - **OQ-6 Platform track is undefined.** PA, PB, PC, P101 are all unspecified yet sit on the critical path. **Spike the Moodle integration against the real `moodle-course-loader` before committing dates.** *Revisit: technical-research + architecture — highest priority next step.*
 
@@ -241,3 +278,5 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 - `[ASSUMPTION]` UI language normalized to English; instructor content may be ES/EN (NFR-6).
 - `[ASSUMPTION]` 50 courses is a directional target over ~3 months, not a hard SLA (SM-1).
 - `[ASSUMPTION]` The intranet does not track the in-Moodle final-validation state in v1; it records only the handoff and `published` (FR-34).
+- `[ASSUMPTION]` A rejected submission is not reopened in v1; re-attempt = new submission (FR-24a).
+- `[ASSUMPTION]` Asset type/size/count limits are TBD with the team (FR-16a).

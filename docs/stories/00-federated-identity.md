@@ -93,8 +93,10 @@ simplifica respecto a versiones previas: sin pieza Nostr.)
 ## Open questions
 
 - **Estrategia de vinculación estudiante→profesor** cuando el identificador NO casa — definir
-  el flujo y el fallback.
-- **¿Authentik full en MVP?** Montar el IdP self-hosted con 3 métodos es semanas de infra.
-  Alternativa para el piloto: un solo método (GitHub OIDC, que ya se necesita para los PRs de
-  [Story 05](05-approval-github-pr.md)) y Authentik federado en fase 2. Decisión de negocio —
-  ver [risks.md](../risks.md#identity-mvp-scope).
+  el flujo y el fallback (PRD OQ-4, build-blocking, → architecture).
+
+## Resolved
+
+- **¿Authentik full en MVP?** — RESUELTO (PRD, decision-log Q1): se va por **federación completa
+  de 3 métodos en v1** (local + Google + GitHub vía Authentik self-hosted), con 2 devs dedicados.
+  No se toma el piloto GitHub-OIDC-only.

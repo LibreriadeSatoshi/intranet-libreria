@@ -35,7 +35,7 @@ profile will be easy and frictionless.
 
 - **Name or Pseudo** — public to everyone.
 - **Email** — should show the one in our database.
-- **Confirmation Email** — should show the one in our database — *Optional* (see open question).
+- **Confirmation Email** — should show the one in our database — **required**; must match the email.
 - **Biography / short bio** — 50 to 300 words. Editable later.
 - **GitHub username.**
 
@@ -54,7 +54,6 @@ profile will be easy and frictionless.
 - Where is your residency? (needed for payments)
 - Anything else you want to share with us — free text block.
 
-## Open questions
+## Resolved
 
-- **Confirmation Email marked "Optional"** — an optional confirmation email confirms nothing.
-  Decide whether it's required, or drop it.
+- **Confirmation Email** — required (PRD OQ-7 / FR-10). Reflected in Required fields above.

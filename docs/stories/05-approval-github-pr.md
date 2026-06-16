@@ -65,11 +65,14 @@ Requests against this repo. Each course lives in its own Markdown files/folder.
 
 ## Open questions
 
-- **Companion `.yml` vs Markdown** for category/cohort/shortname — decide.
+- **Companion `.yml` vs Markdown** for category/cohort/shortname — decide (PRD OQ-5, → architecture).
 - **Identity reconciliation:** PR authorship/auth is GitHub-based, but the rest of the system
   keys on the IdP `sub` ([Story 00](00-federated-identity.md)). How do GitHub identity and
-  IdP identity map? GPG signing sharpens this question. See
+  IdP identity map? GPG signing sharpens this question (PRD OQ-4, build-blocking). See
   [risks.md](../risks.md#github-vs-idp-identity).
-- **Handoff mechanism conflict:** here, merge → GitHub Action → Moodle (automatic). But
-  [Story 06](06-handoff-moodle-publication.md) describes a Sheet + batch loader. These are two
-  different architectures — unify. See [risks.md](../risks.md#dual-handoff-mechanism).
+
+## Resolved
+
+- **Handoff mechanism** — RESOLVED (PRD OQ-1): the PR merge **triggers the build automatically**
+  (build may run async/queued); there is **no manual Sheet step**. Unified with
+  [Story 06](06-handoff-moodle-publication.md).

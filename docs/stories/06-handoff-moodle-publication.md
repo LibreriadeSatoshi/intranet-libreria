@@ -28,8 +28,10 @@ instructor, **so that** students can find me.
 - **Document generation** — On approval, generation of the `MKT_BRIEFING` and the
   `COURSE_MASTER_PLAN` ([PA](../platform/PA-document-generation.md)) is triggered following
   the temporal sequence ([PB](../platform/PB-handoff-sequence.md)).
-- **Handoff** — When the `COURSE_MASTER_PLAN` is ready, its reference enters the Sheet the
-  loader processes; the loader builds the course ([PC](../platform/PC-loader-build-course.md)).
+- **Handoff** — The PR merge **automatically** triggers the handoff (no manual Sheet step); when
+  the `COURSE_MASTER_PLAN` is ready the loader builds the course
+  ([PC](../platform/PC-loader-build-course.md)), and the intranet records the handoff event and
+  notifies Operations. The build may run async/queued.
 - **Handoff confirmation** — The intranet records the Moodle Link (write-back) and reflects
   the course as published.
 - **Instructor role (intranet)** — With ≥1 approved course, the profile shows the instructor
@@ -46,10 +48,9 @@ instructor, **so that** students can find me.
 - The structure Google Doc is **no longer** a manual bridge: the `COURSE_MASTER_PLAN` is the
   loader's input, which builds the structure automatically ([PC](../platform/PC-loader-build-course.md)).
 
-## Open questions
+## Resolved
 
-- **Dual handoff mechanism** — reconcile the GitHub Action (automatic, on-merge) from
-  [Story 05](05-approval-github-pr.md) with the Sheet + batch loader described here. See
-  [risks.md](../risks.md#dual-handoff-mechanism).
-- **Post-publish edits / data consistency** — what happens when intranet data and Moodle
-  content diverge after publication? See [risks.md](../risks.md#data-consistency).
+- **Dual handoff mechanism** — RESOLVED (PRD OQ-1): PR merge triggers the build automatically;
+  no manual Sheet. Reflected in Acceptance criteria above and in [Story 05](05-approval-github-pr.md).
+- **Post-publish edits / data consistency** — RESOLVED (PRD OQ-2): fire-and-forget. After publish,
+  content lives only in Moodle (edits there); the intranet keeps the historical record only.

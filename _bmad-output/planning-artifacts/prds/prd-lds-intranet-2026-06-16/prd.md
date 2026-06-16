@@ -120,7 +120,7 @@ Full federated identity in v1 (2 developers dedicated). One canonical identity p
 
 - **FR-8** [v1] The site must present a discoverable **"Teach on LdS"** entry action in a consistent, documented location.
 - **FR-9** [v1] The entry action must be **state-aware**: unauthenticated → sign-in (§4.1); authenticated with no submission → start a new draft; with existing draft(s) → submissions dashboard; established instructor → instructor dashboard.
-- **FR-10** [v1] The profile wizard must capture required fields: name or pseudonym (public), email (pre-filled from identity), biography (50–300 words, editable later), GitHub username, whether they have an audience, and residency location (for payments).
+- **FR-10** [v1] The profile wizard must capture required fields: name or pseudonym (public), email (pre-filled from identity), **confirmation email (required)**, biography (50–300 words, editable later), GitHub username, whether they have an audience, and residency location (for payments).
 - **FR-11** [v1] The profile wizard must capture optional fields: LinkedIn, Nostr, X, years of teaching experience, teaching environments (multi-select, shown only if experience given), and a free-text note.
 - **FR-12** [v1] Profile data must be editable after initial submission.
 
@@ -131,6 +131,7 @@ Full federated identity in v1 (2 developers dedicated). One canonical identity p
 - **FR-15** [v1] The flow must capture a **content breakdown per class**: class number/title, topics, objectives, activities (quiz/exercises), and source materials.
 - **FR-16** [v1] The flow must capture presentation video(s) for social media and the content-ownership / open-source licensing agreement.
 - **FR-17** [v1] On submission, the system must produce a **review-ready package** (Markdown) structured for the GitHub PR workflow (§4.5), and this package must be the source for the MKT_BRIEFING and COURSE_MASTER_PLAN. *(Single point of generation — see OQ-3.)*
+- **FR-17a** [v1] After submission, **course content is edited as Markdown in the `courses` repo (GitHub) by the instructor** — the intranet's captured course content becomes **read-only** at that point. The intranet retains the record but is no longer the content-editing surface. *(Resolves OQ-2; content-ownership lifecycle: intranet wizard/draft → GitHub Markdown after submit → Moodle after publish.)*
 
 ### 4.4 Drafts *(story 04)*
 
@@ -157,14 +158,16 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 - **FR-30** [v1] The system must hand the COURSE_MASTER_PLAN to the **loader**, which builds the course structure in Moodle in a **"hidden from students"** state.
 - **FR-31** [v1] On publish, the instructor must be assigned the appropriate **Teacher role and enrolment** in the Moodle course (platform P101).
 - **FR-32** [v1] On successful build, the **Moodle link** must be written back to the intranet and the submission status set to `published`.
-- **FR-33** [v1] The handoff must be defined as a single, authoritative **sequence/state machine** (`approved` → generated → built → `published`), reconciling the two mechanisms described in the source docs (PR-merge automation vs. batch loader). *(See OQ-1.)*
-- **FR-34** [v1] The UI must communicate that handoff is **not instantaneous** (batch), so `approved` may persist before `published`.
+- **FR-33** [v1] The handoff must follow this authoritative sequence (resolves OQ-1): **PR merge triggers the build automatically**; before/at handoff the intranet **records the handoff event and notifies Operations** (§4.7); the loader builds the course in Moodle in a **"hidden from students"** state; the **instructor completes the course setup in Moodle**; a **final validation is performed in Moodle** before the course is opened to students. The intranet's responsibility ends at `published` (built + Moodle link recorded, hidden); making the course student-visible happens in Moodle, out of intranet scope.
+- **FR-34** [v1] The intranet must record and surface that handoff is **not instantaneous**, so a course may sit at `approved` before `published`, and that **final validation occurs in Moodle** after publish (before students see it). `[ASSUMPTION]` the intranet does not track the in-Moodle validation state in v1; it only records the handoff and `published`.
 - **FR-35** [v1] A person with ≥1 approved course must be marked **instructor** in the intranet.
 - **FR-36** [v1] The handoff must define behavior on **failure** (build error / retry) and **re-run** (idempotency) so a failed or repeated handoff does not corrupt Moodle state. `[ASSUMPTION]` (v1 may handle this manually but the behavior must be specified.)
+- **FR-36a** [v1] After publication, **course content lives only in Moodle**; edits post-publish are made in Moodle, not the intranet or GitHub (resolves OQ-2). The intranet keeps the historical record only.
 
 ### 4.7 Notifications & Lead Capture *(customer.io)*
 
 - **FR-37** [v1] The intranet must send transactional emails via **customer.io** at key transitions: profile/course submitted, changes requested, approved, and published.
+- **FR-37a** [v1] On **handoff** (PR merge → build triggered), the intranet must **notify Operations** that a handoff has started, in addition to recording the event (FR-33).
 - **FR-38** [v1] When a user starts **"Teach on LdS,"** the intranet must register them as a **lead** in customer.io, even if they never complete the wizard.
 - **FR-39** [v1] The **published** notification to the instructor must include the **Moodle link**. (Promo-kit contents are §4.8 / deferred.)
 
@@ -217,15 +220,18 @@ The critical path. Publishing a live course in Moodle is the only step that deli
 
 ## 9. Open Questions
 
-These are genuine decisions, several of them "one-way doors." They should be resolved during architecture/solutioning (the platform track especially) — **not** silently assumed.
+### Resolved (2026-06-16)
 
-- **OQ-1 Handoff mechanism (one-way door).** The docs describe two conflicting mechanisms: PR-merge → automated action → Moodle, vs. COURSE_MASTER_PLAN → sheet → **batch** loader. FR-33 requires a single authoritative sequence. Which is it? *(Highest-impact technical decision; shapes all of §4.6.)*
-- **OQ-2 Post-publish data consistency (one-way door).** Are edits allowed after publication, and on which side (intranet vs. Moodle)? Determines whether handoff is fire-and-forget or requires bidirectional reconciliation. *(Was the source doc's original opening question.)*
-- **OQ-3 Artifact generation point.** Where is the course package / COURSE_MASTER_PLAN / MKT_BRIEFING generated — in the wizard, at approval, or inside the loader? FR-17/FR-29 assume a single point; pin it.
-- **OQ-4 GitHub ↔ canonical identity mapping.** With full federation in v1 (not GitHub-only), PR authorship is GitHub-based but the canonical identity may have signed in via Google/local. How are they linked (FR-6)? GPG-signed commits sharpen this.
-- **OQ-5 Submission metadata format.** Category/cohort/shortname as a companion `.yml` or inline in the Markdown package (FR-28)?
-- **OQ-6 Platform track is undefined.** PA, PB, PC, P101 are all unspecified yet sit on the critical path. **Spike the Moodle integration against the real `moodle-course-loader` before committing dates.** *(Carry into architecture + technical-research.)*
-- **OQ-7 Confirmation-email field** in the profile wizard — keep or drop (FR-10/11)? Currently ambiguous in the docs.
+- **OQ-1 Handoff mechanism (one-way door) — RESOLVED.** PR merge triggers the build automatically; the intranet records the handoff event and notifies Operations; the loader builds the course in Moodle hidden-from-students; the instructor completes setup in Moodle; a final validation is done in Moodle before opening to students. See FR-33/FR-34/FR-37a. *(Detailed sequence/state machine still to be designed in architecture — see OQ-6.)*
+- **OQ-2 Post-publish data consistency (one-way door) — RESOLVED.** Fire-and-forget from the intranet. Content-ownership lifecycle: intranet wizard/draft → **GitHub Markdown** (instructor edits there after submit; intranet content goes read-only) → **Moodle** after publish (edits only in Moodle thereafter). See FR-17a/FR-36a.
+- **OQ-7 Confirmation-email field — RESOLVED.** Required in the profile wizard. See FR-10.
+
+### Open — deferred to architecture/solutioning (owner: dev team / `bmad-create-architecture`)
+
+- **OQ-3 Artifact generation point.** Where is the course package / COURSE_MASTER_PLAN / MKT_BRIEFING generated — in the wizard, at approval, or inside the loader? FR-17/FR-29 assume a single point; pin it. *Revisit: at architecture, before building §4.6.*
+- **OQ-4 GitHub ↔ canonical identity mapping.** With full federation in v1, PR authorship is GitHub-based but the canonical identity may have signed in via Google/local. How are they linked (FR-6)? GPG-signed commits sharpen this. *Revisit: at architecture, before integrating §4.1 + §4.5.*
+- **OQ-5 Submission metadata format.** Category/cohort/shortname as a companion `.yml` or inline in the Markdown package (FR-28)? *Revisit: at architecture, low stakes.*
+- **OQ-6 Platform track is undefined.** PA, PB, PC, P101 are all unspecified yet sit on the critical path. **Spike the Moodle integration against the real `moodle-course-loader` before committing dates.** *Revisit: technical-research + architecture — highest priority next step.*
 
 ## 10. Assumptions Index
 
@@ -234,3 +240,4 @@ These are genuine decisions, several of them "one-way doors." They should be res
 - `[ASSUMPTION]` Students and the public front are phase 2+ (§2.2, §8).
 - `[ASSUMPTION]` UI language normalized to English; instructor content may be ES/EN (NFR-6).
 - `[ASSUMPTION]` 50 courses is a directional target over ~3 months, not a hard SLA (SM-1).
+- `[ASSUMPTION]` The intranet does not track the in-Moodle final-validation state in v1; it records only the handoff and `published` (FR-34).

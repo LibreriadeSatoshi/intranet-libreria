@@ -23,7 +23,8 @@ status: draft
 ## Visibility / authorization
 
 - [ ] Decide and implement who sees the entry point (open question).
-- [ ] Apply the intranet role model (instructor / reviewer-Ops / marketing) for what each sees.
+- [ ] Enforce the intranet role model — instructor / reviewer-Ops / marketing / **admin** —
+      per the role × capability matrix (FR-7a, least-privilege) for what each role sees/does.
 
 ## Done when
 

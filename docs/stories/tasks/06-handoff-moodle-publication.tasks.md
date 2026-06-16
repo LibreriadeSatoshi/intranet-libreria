@@ -19,9 +19,12 @@ status: draft
 
 ## Handoff
 
-- [ ] On approval, trigger document generation (PA) following the sequence (PB).
-- [ ] Enter the `COURSE_MASTER_PLAN` reference into the Sheet the loader processes.
-- [ ] Loader builds the course (PC); reconcile with the on-merge GitHub Action ([Story 05](../05-approval-github-pr.md)).
+- [ ] On approval/merge, **automatically** trigger document generation (PA) following the
+      sequence (PB) — **no manual Sheet step** (DECIDED, OQ-1).
+- [ ] Intranet records the handoff event and **notifies Operations** that the handoff started
+      (FR-37a).
+- [ ] Loader builds the course (PC) — triggered by the merge from [Story 05](../05-approval-github-pr.md);
+      the build itself may run async/queued.
 
 ## Write-back & state
 

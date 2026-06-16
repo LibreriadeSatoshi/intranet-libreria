@@ -7,10 +7,12 @@ status: draft
 # Story 05 — Implementation tasks
 
 > Tasks for [Story 05](../05-approval-github-pr.md). Owner: Ops.
-> **Caveats:** the on-merge → Moodle upload depends on the loader/platform track
-> ([Story 06](../06-handoff-moodle-publication.md), PC); and GitHub↔IdP identity must be
-> reconciled — [risks.md](../../risks.md#github-vs-idp-identity),
-> [#dual-handoff](../../risks.md#dual-handoff-mechanism).
+> **Handoff mechanism — DECIDED (PRD OQ-1):** PR **merge triggers the build automatically**
+> (the build itself may run async/queued); there is **no manual Sheet step**. Reconciliation
+> with [Story 06](../06-handoff-moodle-publication.md) is resolved — see that file.
+> **Still open:** the on-merge build depends on the loader/platform track (PC, OQ-6 spike); and
+> GitHub↔canonical-identity must be reconciled (OQ-4, **build-blocking**) —
+> [risks.md](../../risks.md#github-vs-idp-identity).
 
 ## Repo & structure
 
@@ -28,11 +30,16 @@ status: draft
 - [ ] Reviewer playbook: Approve / Request changes (comment required) / Close (comment required).
 - [ ] Confirm push-to-PR re-opens review automatically; merge = sign-off.
 - [ ] Rely on GitHub's built-in notifications for every review action.
+- [ ] **Rejected path (FR-24a):** on close-unmerged, notify the instructor with the reviewer's
+      reason, keep the submission visible **read-only**; re-attempt requires a **new submission**
+      (a rejected submission is not reopened in v1).
 
 ## Publish automation
 
-- [ ] GitHub Action on merge → upload course to Moodle in **'Hidden from Students'** state.
-- [ ] Reconcile this automatic path with the batch-loader handoff ([Story 06](../06-handoff-moodle-publication.md)).
+- [ ] On merge, **automatically trigger** the handoff/build (no manual step); the build may run
+      async/queued. Course is created in Moodle in **'Hidden from Students'** state.
+- [ ] On trigger, the intranet **records the handoff event and notifies Operations** (FR-37a);
+      detailed sequence/orchestration lives in [Story 06](../06-handoff-moodle-publication.md).
 
 ## Done when
 

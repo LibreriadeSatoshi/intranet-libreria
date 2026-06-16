@@ -7,9 +7,11 @@ status: draft
 # Story 00 — Implementation tasks
 
 > Tasks for [Story 00](../00-federated-identity.md).
-> **Blocked on a business decision:** full Authentik (3 methods) vs GitHub-OIDC-only for the
-> pilot — see [risks.md](../../risks.md#identity-mvp-scope). Tasks below assume the full IdP;
-> the thin path drops the Authentik-infra tasks and keeps only GitHub OIDC.
+> **Identity scope — DECIDED (PRD 2026-06-16):** full 3-method federation in v1 (local
+> username/password + Google OIDC + GitHub OIDC via self-hosted Authentik); 2 devs dedicated.
+> The GitHub-OIDC-only pilot path is **not** taken. Tasks below implement the full IdP.
+> Still open (→ architecture, OQ-4, **build-blocking**): GitHub↔canonical-identity mapping and
+> the existing-student→teacher linking fallback.
 
 ## Spike (do first)
 

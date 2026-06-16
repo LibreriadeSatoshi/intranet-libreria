@@ -23,7 +23,7 @@ status: draft
 
 - [ ] Bio length 50–300 words; editable later.
 - [ ] GitHub username format check.
-- [ ] **Decide** the confirmation-email field: make it required or drop it (open question).
+- [ ] Confirmation-email field is **required** (DECIDED, PRD OQ-7 / FR-10) — validate it matches the email.
 
 ## Persistence
 

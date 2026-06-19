@@ -14,8 +14,8 @@ jira: ENG-272
 
 **Tasks:** [implementation breakdown →](tasks/00-federated-identity.tasks.md)
 
-> *IdP = Identity Provider · OIDC = OpenID Connect (capa de identidad sobre OAuth 2.0) ·
-> `sub` = identificador de usuario, único por IdP.*
+> *IdP = Identity Provider · OIDC = OpenID Connect (identity layer on top of OAuth 2.0) ·
+> `sub` = user identifier, unique per IdP.*
 
 ## User story
 
@@ -25,78 +25,78 @@ Moodle is down.
 
 ## Model (proposed)
 
-- IdP dedicado del que cuelgan Google y GitHub. Intranet y Moodle son clientes
-  independientes del IdP vía OIDC.
-- El IdP es la fuente única de identidad para quien entra por la intranet. Autenticación
-  (quién eres) vive en el IdP; autorización (qué puedes hacer) vive en cada sistema por
-  separado.
+- Dedicated IdP that Google and GitHub connect to. Intranet and Moodle are independent 
+  clients of the IdP via OIDC.
+- The IdP is the single source of identity for anyone entering through the intranet. Authentication
+  (who you are) lives in the IdP; authorization (what you can do) lives in each system 
+  separately.
 
 ## Acceptance criteria
 
-- **Métodos de login (vía IdP):** usuario/contraseña (cuenta local en el IdP), Google
-  (OIDC) o GitHub (OIDC); el usuario elige. Nostr no es método de la intranet; vive solo en
-  Moodle (nativo). Un profesor que use Nostr en Moodle accede a la intranet con cualquiera de
-  los tres métodos del IdP, sin traer una identidad social externa.
-- **Identidad única:** un solo registro (la cuenta del IdP); la intranet guarda solo la
-  referencia al **`sub` del IdP** (no al `sub` de Google ni de GitHub). Los tres métodos
-  conviven en la misma cuenta del IdP y resuelven al mismo `sub`.
-- **Independencia de fallo:** si Moodle está caído, el IdP y la intranet siguen autenticando.
-  La identidad de profes/staff no depende de Moodle.
-- **Provisión en primer login:** usuario nuevo entra por la landing → IdP autentica → la
-  intranet crea su perfil (instructor/staff) referenciado por el `sub` del IdP.
+- **Login methods (via IdP):** user/password (local account in the IdP), Google
+  (OIDC) or GitHub (OIDC); the user chooses. Nostr is not an intranet method; it lives only in
+  Moodle (native). A teacher using Nostr in Moodle accesses the intranet with any of
+  the three IdP methods, without bringing an external social identity.
+- **Unique identity:** a single record (the IdP account); the intranet only stores the
+  reference to the **IdP `sub`** (not the Google or GitHub `sub`). The three methods
+  coexist in the same IdP account and resolve to the same `sub`.
+- **Failure independence:** if Moodle is down, the IdP and the intranet continue authenticating.
+  Teacher/staff identity does not depend on Moodle.
+- **Provisioning on first login:** a new user enters through the landing page → IdP authenticates → the
+  intranet creates their profile (instructor/staff) referenced by the IdP `sub`.
 
 ## Entry gates (principle: the gate decides the method)
 
-- Entrada por la intranet (landing "Conviértete en profesor", o staff) → IdP (Google/GitHub).
-- Entrada por Moodle directo (estudiante a su curso) → login nativo de Moodle
-  (Google/GitHub/Nostr/user-pass). Sin tocar el IdP.
+- Entry through the intranet (landing page "Become a teacher", or staff) → IdP (Google/GitHub).
+- Direct entry through Moodle (student to their course) → Moodle native login
+  (Google/GitHub/Nostr/user-pass). Without touching the IdP.
 
 ## Single friction case — existing student → teacher
 
-Ocurre en la landing. El usuario ya tiene cuenta Moodle (creada como estudiante). Al entrar
-por la intranet vía IdP, si el identificador casa (mismo Google/GitHub), se vincula. Si no,
-hay un paso de vinculación de su cuenta Moodle existente a la identidad del IdP. Definir la
-estrategia de vinculación y el fallback.
+Occurs on the landing page. The user already has a Moodle account (created as a student). When entering
+through the intranet via IdP, if the identifier matches (same Google/GitHub), it is linked. If not,
+there is a step to link their existing Moodle account to the IdP identity. Define the
+linking strategy and fallback.
 
 ## Scope — students out of the IdP for now
 
-Los estudiantes siguen en Moodle nativo. El IdP es solo para profes/staff. Ampliar a
-estudiantes es una fase futura (sumar usuarios al mismo IdP, sin rehacer arquitectura).
+Students remain in native Moodle. The IdP is only for teachers/staff. Expanding to
+students is a future phase (adding users to the same IdP, without redoing the architecture).
 
 ## Authorization (NOT managed by the IdP)
 
-- El IdP aporta **identidad y el rol amplio** (staff/instructor). La autorización fina la
-  gestiona cada sistema.
-- Roles de intranet (propios): instructor, revisor/Ops, marketing.
-- Roles de Moodle (propios, gestionados en Moodle): Student, Teacher, Manager, admin. El
-  loader asigna Teacher al publicar ([P101](../platform/P101-moodle-user-role-enrolment.md));
-  Manager y admin se gestionan en Moodle. El rol admin de Moodle es ortogonal a la intranet.
+- The IdP provides **identity and the broad role** (staff/instructor). Fine-grained authorization is
+  managed by each system.
+- Intranet roles (own): instructor, reviewer/Ops, marketing.
+- Moodle roles (own, managed in Moodle): Student, Teacher, Manager, admin. The
+  loader assigns Teacher upon publishing ([P101](../platform/P101-moodle-user-role-enrolment.md));
+  Manager and admin are managed in Moodle. The Moodle admin role is orthogonal to the intranet.
 
 ## Technical notes
 
-- IdP: **Authentik self-hosted** (proporcionado al volumen acotado de profes/staff). Solo
-  Google/GitHub (OAuth estándar, de fábrica); sin desarrollo de Nostr-stage, al quedar Nostr
-  fuera del IdP.
-- El token OIDC del IdP es para login. Las llamadas a Web Services de Moodle (crear cursos,
-  asignar roles, [P101](../platform/P101-moodle-user-role-enrolment.md)) siguen usando
-  `wstoken`. Autenticación e integración API son planos separados.
-- Moodle 5.1: conectar Moodle al IdP como cliente OAuth2 core (config, no plugin). 5.1 exige
-  mover plugins a `/public` tras upgrade.
-- Migración: mapear profes/staff existentes al `sub` del IdP (puntual, no lógica permanente).
+- IdP: **Authentik self-hosted** (proportioned to the limited volume of teachers/staff). Only
+  Google/GitHub (standard OAuth, out of the box); no Nostr-stage development, as Nostr remains
+  outside the IdP.
+- The IdP OIDC token is for login. Calls to Moodle Web Services (create courses,
+  assign roles, [P101](../platform/P101-moodle-user-role-enrolment.md)) continue using
+  `wstoken`. Authentication and API integration are separate planes.
+- Moodle 5.1: connect Moodle to the IdP as a core OAuth2 client (config, not plugin). 5.1 requires
+  moving plugins to `/public` after upgrade.
+- Migration: map existing teachers/staff to the IdP `sub` (one-off, not permanent logic).
 
 ## Recommended spike (before implementing)
 
-Validar Authentik para el volumen profes/staff, conectar Moodle 5.1 como cliente OIDC,
-confirmar `sub` estable 1:1, y la estrategia de vinculación estudiante→profesor. (Se
-simplifica respecto a versiones previas: sin pieza Nostr.)
+Validate Authentik for the teacher/staff volume, connect Moodle 5.1 as an OIDC client,
+confirm stable 1:1 `sub`, and the student→teacher linking strategy. (It is
+simplified compared to previous versions: no Nostr piece.)
 
 ## Open questions
 
-- **Estrategia de vinculación estudiante→profesor** cuando el identificador NO casa — definir
-  el flujo y el fallback (PRD OQ-4, build-blocking, → architecture).
+- **Student→teacher linking strategy** when the identifier does NOT match — define
+  the flow and the fallback (PRD OQ-4, build-blocking, → architecture).
 
 ## Resolved
 
-- **¿Authentik full en MVP?** — RESUELTO (PRD, decision-log Q1): se va por **federación completa
-  de 3 métodos en v1** (local + Google + GitHub vía Authentik self-hosted), con 2 devs dedicados.
-  No se toma el piloto GitHub-OIDC-only.
+- **Full Authentik in MVP?** — RESOLVED (PRD, decision-log Q1): going for **complete federation
+  of 3 methods in v1** (local + Google + GitHub via Authentik self-hosted), with 2 dedicated devs.
+  Not taking the GitHub-OIDC-only pilot.

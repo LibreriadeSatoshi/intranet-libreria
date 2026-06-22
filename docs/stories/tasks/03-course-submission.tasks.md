@@ -7,9 +7,10 @@ status: draft
 # Story 03 — Implementation tasks
 
 > Tasks for [Story 03](../03-course-submission.md). Depends on [Story 02](../02-teacher-profile-wizard.md).
-> **Deferred to architecture (OQ-3):** pin the single generation point for the `.md` package /
-> COURSE_MASTER_PLAN / MKT_BRIEFING (wizard / approval / loader) before building §4.6 —
-> [risks.md](../../risks.md#artifact-generation-pipeline).
+> **Artifact pipeline — DECIDED (architecture, resolves OQ-3):** the wizard generates
+> `MKT_BRIEFING.md` from submission data and **scaffolds** `COURSE_MASTER_PLAN.md` (the
+> instructor then authors/edits it as Markdown in the `courses` repo); a `course.yml` companion
+> carries machine metadata. See architecture.md (Artifact Pipeline).
 
 ## Data model
 
@@ -34,9 +35,11 @@ status: draft
 
 ## Package generation
 
-- [ ] Render the review-ready Markdown template from the collected data (shape in the story).
-- [ ] Create/seed the `MKT_BRIEFING` `.md` in GitHub and return the link to the instructor.
-- [ ] Hand the package to the GitHub PR flow ([Story 05](../05-approval-github-pr.md)).
+- [ ] Generate `MKT_BRIEFING.md` from the wizard submission data.
+- [ ] Scaffold `COURSE_MASTER_PLAN.md` from the collected data (shape in the story) for the
+      instructor to author/edit in GitHub.
+- [ ] Emit the `course.yml` companion (machine metadata: category, cohort, shortname, type).
+- [ ] Hand the package off to the GitHub PR flow ([Story 05](../05-approval-github-pr.md)).
 - [ ] **On submit, intranet course content becomes read-only (FR-17a):** further edits happen
       as Markdown in the `courses` repo; the intranet keeps the record but stops being the
       content-editing surface.

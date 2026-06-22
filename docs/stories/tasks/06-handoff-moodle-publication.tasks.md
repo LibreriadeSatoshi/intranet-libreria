@@ -24,12 +24,18 @@ status: draft
 - [ ] Intranet records the handoff event and **notifies Operations** that the handoff started
       (FR-37a).
 - [ ] Loader builds the course (PC) — triggered by the merge from [Story 05](../05-approval-github-pr.md);
-      the build itself may run async/queued.
+      the build runs as a queued job (pg-boss, see architecture).
+- [ ] **Idempotency + failure handling (FR-36, NFR-5):** key the job by submission + a
+      deterministic Moodle shortname so re-runs never duplicate; retry with backoff →
+      dead-letter + Ops notification on failure.
+- [ ] **Asset resolution (FR-16a):** the worker resolves large assets from Garage and
+      re-uploads them into Moodle at build time.
 
 ## Write-back & state
 
 - [ ] Record the Moodle Link in the intranet (write-back); flip course to `published`.
 - [ ] Model the `approved` → `published` sub-state (handoff is batch, not instantaneous).
+- [ ] On `published`, notify the instructor with the Moodle link (FR-39, customer.io).
 
 ## Roles & visibility
 

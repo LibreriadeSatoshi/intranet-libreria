@@ -3,7 +3,7 @@ id: "04"
 title: Save & resume drafts
 track: product
 status: draft
-mvp: false
+mvp: true
 owner: TBD
 depends_on: ["02", "03"]
 risk: medium

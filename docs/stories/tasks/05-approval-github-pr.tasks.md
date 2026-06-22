@@ -18,18 +18,25 @@ status: draft
 
 - [ ] Create the single `courses` repo.
 - [ ] Define the per-course folder/Markdown structure (matching [Story 03](../03-course-submission.md)).
-- [ ] **Decide:** companion `.yml` vs in-Markdown for category / cohort / short name.
+- [ ] **Companion `course.yml`** carries machine metadata (category, cohort, shortname, type) —
+      DECIDED (architecture, resolves OQ-5). The reviewer writes the assigned Moodle category
+      here at approval (FR-30a).
 
 ## Submission flow
 
-- [ ] Document the fork/branch → PR submission path for instructors.
-- [ ] GitHub auth for PRs (and consider GPG-signed commits as a nice-to-have).
+- [ ] On submit, the **`course_bot` GitHub App** opens the PR in the `courses` repo with
+      `COURSE_MASTER_PLAN.md` + `MKT_BRIEFING.md` + `course.yml` (architecture).
+- [ ] Instructor authors/edits the curriculum as Markdown in the PR, then comments
+      **`@course_bot finished_course`** → status advances to `submitted` (ChatOps trigger).
+- [ ] GitHub auth / GPG-signed commits (nice-to-have). **GitHub PR author ↔ canonical identity
+      (FR-6) blocked by OQ-4** — implemented in [Story 00](00-federated-identity.tasks.md).
 
 ## Review flow (Ops)
 
 - [ ] Reviewer playbook: Approve / Request changes (comment required) / Close (comment required).
 - [ ] Confirm push-to-PR re-opens review automatically; merge = sign-off.
-- [ ] Rely on GitHub's built-in notifications for every review action.
+- [ ] Notify the instructor on every review action via **customer.io** (FR-27/37), beyond
+      GitHub's built-in PR notifications.
 - [ ] **Rejected path (FR-24a):** on close-unmerged, notify the instructor with the reviewer's
       reason, keep the submission visible **read-only**; re-attempt requires a **new submission**
       (a rejected submission is not reopened in v1).

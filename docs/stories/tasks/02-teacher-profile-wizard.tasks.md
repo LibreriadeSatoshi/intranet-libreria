@@ -28,6 +28,7 @@ status: draft
 ## Persistence
 
 - [ ] Save profile and allow continue to the next onboarding step (course submission).
+- [ ] Allow editing the profile after initial submission (FR-12).
 
 ## Done when
 

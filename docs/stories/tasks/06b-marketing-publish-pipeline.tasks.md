@@ -6,6 +6,9 @@ status: draft
 
 # Story 06b — Implementation tasks
 
+> **Out of v1 scope (deferred, `mvp: false`).** Post-MVP per PRD §8 (FR-42). The tasks below
+> are not part of the 3-month v1 skeleton; kept for dependency visibility.
+>
 > Tasks for [Story 06b](../06b-marketing-publish-pipeline.md). Owner: Aria Cediel.
 > Depends on `MKT_BRIEFING` ([PA](../../platform/PA-document-generation.md)) and the
 > `published` state ([Story 06](../06-handoff-moodle-publication.md)).

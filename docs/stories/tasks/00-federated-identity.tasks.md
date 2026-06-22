@@ -43,8 +43,11 @@ status: draft
 ## Linking & migration
 
 - [ ] Implement existing-student → teacher linking (auto-link on matching identifier).
-- [ ] Build the manual linking step + fallback for the non-matching case.
-- [ ] One-off migration: map existing teachers/staff to their IdP `sub`.
+      **Blocked by OQ-4** (linking strategy must be decided first).
+- [ ] Build the manual linking step + fallback for the non-matching case. **Blocked by OQ-4.**
+- [ ] Reconcile GitHub PR author ↔ canonical identity (FR-6). **Blocked by OQ-4** — implement
+      once the mapping is decided in architecture; this is a v1, build-blocking FR.
+- [ ] [later] One-off migration: map existing teachers/staff to their IdP `sub` (FR-7 deferred).
 
 ## Done when
 

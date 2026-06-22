@@ -28,7 +28,7 @@ status: draft
 ## Dashboard
 
 - [ ] List all of a user's drafts, each with a "Continue" action.
-- [ ] Support multiple simultaneous drafts of different courses.
+- [ ] [later] Multiple simultaneous drafts per user (FR-21 deferred; v1 = single-draft save/resume).
 
 ## Done when
 

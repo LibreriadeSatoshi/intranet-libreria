@@ -12,6 +12,8 @@ status: draft
 
 - [ ] Add a "Become a Teacher" CTA in a consistent, documented location (define exact placement).
 - [ ] Wire the CTA into the public landing on Librería's site.
+- [ ] **Lead capture (FR-38):** on hitting "Become a Teacher", register the user as a lead in
+      customer.io even if they never finish the wizard.
 
 ## State-aware routing
 

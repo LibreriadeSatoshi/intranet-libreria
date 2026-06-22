@@ -6,6 +6,9 @@ status: draft
 
 # Story 08 — Implementation tasks
 
+> **Out of v1 scope (deferred, `mvp: false`).** Post-MVP per PRD §8 (FR-43; public front). The
+> tasks below are not part of the 3-month v1 skeleton; kept for dependency visibility.
+>
 > Tasks for [Story 08](../08-public-instructor-profile.md). Owner: Aria Cediel / Marketing.
 > Depends on `published` courses ([Story 06](../06-handoff-moodle-publication.md)) and
 > `MKT_BRIEFING` ([PA](../../platform/PA-document-generation.md)).

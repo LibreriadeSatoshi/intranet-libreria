@@ -1,4 +1,4 @@
-# PRD Quality Review — lds-intranet (2026-06-16)
+# PRD Quality Review — libreria-intranet (2026-06-16)
 
 Scope: `prd.md` + `addendum.md`. Audience: ~3-dev team, ~3-month v1 build. Findings only; no praise.
 
@@ -79,7 +79,7 @@ A solid, well-organized PRD with clear vision and good traceability, but **not y
 **M-5. Confirmation-email field (FR-10) has no defined behavior.**
 - Touches: FR-10, OQ-7 (RESOLVED only as "required"). It's required but the PRD never says what it does — match against the primary email? block submission on mismatch? trigger a verification step? Resolving "is it required" left "what does it do" open. Fix: specify the validation/verification behavior.
 
-**M-6. Biography 50–300 words but other fields have no constraints.**
+**M-6. Biography 50–300 words but other fielibreria have no constraints.**
 - Touches: FR-10, FR-11, FR-13 ("3 learning objectives"). Bio has a word range and objectives are fixed at 3, but pitch/problem/ideal-student/topics have no length or required/optional bounds beyond the required/optional split. For a wizard with a measured completion rate (SM-2), field-level validation rules matter. Fix: add min/max/required constraints per field, or state they're intentionally free-form.
 
 ---

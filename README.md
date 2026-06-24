@@ -1,4 +1,4 @@
-# lds-intranet
+# Intranet Librería de Satoshi
 
 Librería de Satoshi's intranet — source of truth for instructor onboarding and
 course submission, with handoff to Moodle.

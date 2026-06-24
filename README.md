@@ -31,23 +31,31 @@ as history (basis for future analytics).
 
 ## Stories (epic ENG-271)
 
-Story files live in `docs/stories/` (numbered 00–09; `06b` and `09` are extras). The
-master Jira sequence (ENG-27x) is an older, coarser mapping — several files share one
-Jira id. Mapping:
+Story files live in `docs/stories/` (numbered 00–09; `06b` and `09` are extras).
+Jira mapping (current — the older ENG-272..278 sequence is superseded; one ticket per
+story file under the epic):
 
 | File | Story | Jira | v1 |
 |---|---|---|---|
-| `00-federated-identity` | Federated identity (IdP) | ENG-272 | yes |
-| `01-entry-point` | "Teach on LdS" entry point | ENG-273 | yes |
-| `02-teacher-profile-wizard` | Teacher profile wizard | ENG-274 | yes |
-| `03-course-submission` | Course submission | ENG-274 | yes |
-| `04-save-resume-drafts` | Save & resume drafts | ENG-275 | yes |
-| `05-approval-github-pr` | Approval via GitHub PR | ENG-276 | yes |
-| `06-handoff-moodle-publication` | Handoff to Moodle & publication | ENG-277 | yes |
+| `00-federated-identity` | Federated identity (IdP) | ENG-295 | yes |
+| `01-entry-point` | "Teach on LdS" entry point | ENG-296 | yes |
+| `02-teacher-profile-wizard` | Teacher profile wizard | ENG-297 | yes |
+| `03-course-submission` | Course submission | ENG-298 | yes |
+| `04-save-resume-drafts` | Save & resume drafts | ENG-299 | yes |
+| `05-approval-github-pr` | Approval via GitHub PR | ENG-300 | yes |
+| `06-handoff-moodle-publication` | Handoff to Moodle & publication | ENG-301 | yes |
 | `06b-marketing-publish-pipeline` | Marketing publish pipeline | — | deferred |
-| `07-instructor-promotion-tools` | Instructor promotion kit | ENG-278 | deferred |
+| `07-instructor-promotion-tools` | Instructor promotion kit | — | deferred |
 | `08-public-instructor-profile` | Public profile, featured & exports | — | deferred |
 | `09-doc-reference` | Teacher help / reference docs | — | deferred (stub) |
+
+**Cross-cutting work (no story file — born from the architecture decision):**
+
+| Work | Purpose | Jira | v1 |
+|---|---|---|---|
+| Project init | `create-t3-app` scaffold + Docker Compose (Postgres/Authentik/Garage/loader); prerequisite, blocks all stories | TBD | yes |
+| Moodle loader spike | Validate `moodle-course-loader`, define the platform track (PA/PB/PC/P101); resolves OQ-6/G1, blocks Story 06 | TBD | yes |
+| Identity linking design | Email-match confirmation UX + student→teacher fallback + PR-author↔`sub` (gap G2); design step inside Story 00 | within ENG-295 | yes |
 
 Epic: [ENG-271 — Instructor onboarding & course submission](https://b4os.atlassian.net/browse/ENG-271).
 

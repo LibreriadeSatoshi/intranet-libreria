@@ -1,4 +1,4 @@
-# Addendum — lds-intranet PRD
+# Addendum — libreria-intranet PRD
 
 Technical depth, mechanism options, and source-doc detail that informs downstream work (architecture, solution design) but does not belong in the PRD body. Not authoritative for *what* to build (the PRD is) — this captures *how*-leaning material and rationale so it isn't lost.
 
@@ -15,7 +15,7 @@ The source docs described two architectures as if one:
 1. **Story 05:** PR merge → **GitHub Action** → Moodle (instantaneous automation).
 2. **Story 06 / PB:** COURSE_MASTER_PLAN reference → **Sheet** → **batch loader** run → Moodle (asynchronous).
 
-**Decision (the chosen hybrid):** **PR merge triggers the build automatically** (mechanism 1 is authoritative as the *trigger*); the build itself may run asynchronously/queued (absorbing mechanism 2's batch nature) — but no manual Sheet step is the canonical path. The intranet records the handoff event and notifies Operations on merge; the loader builds in Moodle hidden; the instructor completes setup in Moodle; a final validation happens in Moodle before students see it. See PRD FR-33/FR-34/FR-37a.
+**Decision (the chosen hybrid):** **PR merge triggers the build automatically** (mechanism 1 is authoritative as the *trigger*); the build itself may run asynchronously/queued (absorbing mechanism 2's batch nature) — but no manual Sheet step is the canonical path. The intranet records the handoff event and notifies Operations on merge; the loader builibreria in Moodle hidden; the instructor completes setup in Moodle; a final validation happens in Moodle before students see it. See PRD FR-33/FR-34/FR-37a.
 
 **Still for architecture:** the detailed sequence/state machine, queue vs. synchronous build, error/retry, and idempotency (PRD FR-36). The *trigger* and *ownership boundaries* are no longer open; the *internal orchestration* is (tied to OQ-6 spike).
 
@@ -33,7 +33,7 @@ Pin one source of truth per artifact. Note source typo: `COURSE_COURSE_MASTER_PL
 - **P101** — Moodle user/role/enrolment via web services; assign Teacher/Editing Teacher, enrol instructor on publish; idempotency on re-run; uses `wstoken`. Open: which exact WS functions, role scoping, enrolment method.
 - **PA** — Generate MKT_BRIEFING + COURSE_MASTER_PLAN (Markdown). Open: trigger point (see §C), exact schemas.
 - **PB** — Temporal sequence/state machine: `approved` → generate → queue → batch build → `published` + Moodle-link write-back. Open: intermediate-state persistence, error/retry, write-back confirmation.
-- **PC** — Loader consumes COURSE_MASTER_PLAN, builds course (hidden). Open: Plan → `PlanBCourseBuilder` schema mapping, write-back, idempotency, asset reference resolution, mid-build failure recovery.
+- **PC** — Loader consumes COURSE_MASTER_PLAN, builibreria course (hidden). Open: Plan → `PlanBCourseBuilder` schema mapping, write-back, idempotency, asset reference resolution, mid-build failure recovery.
 
 **Recommendation carried from `docs/risks.md`:** spike the Moodle integration against the real loader codebase *first* — the riskiest, least-specified work is on the critical path.
 

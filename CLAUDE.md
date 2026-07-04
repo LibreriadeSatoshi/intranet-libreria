@@ -25,7 +25,7 @@ not HOW. If a task seems to conflict with architecture, architecture wins — fl
 
 ## Ignore (do not read as truth)
 
-- `lds-intranet.md` — legacy master doc (old numbering, partial duplicates). Superseded by
+- `intranet.md` — legacy master doc (old numbering, partial duplicates). Superseded by
   the PRD. Do not build from it.
 - Any `docs/stories/tasks/*` file with an "Out of v1 scope (deferred)" banner.
 

@@ -1,6 +1,6 @@
 ---
 title: Identity linking design (Gap G2)
-status: draft
+status: approved
 jira: ENG-326
 story: "00"
 covers: [FR-2, FR-2a, FR-6, OQ-4]
@@ -44,20 +44,20 @@ services; a linked GitHub source stores the **numeric GitHub user ID** as `ident
 **Trigger:** a user signs in via a source (Google/GitHub) and an Authentik account with the
 same **verified** email already exists.
 
-**Design:** keep `user_matching_mode: email_link` on both sources — the account is linked
-and the user lands in it (spike-verified). The PRD's "explicit confirmation step" is
-implemented as a **customized source-authentication flow** in Authentik: a prompt stage
-shown only when the matching path fires — "An account `<username>` with this email already
-exists. Link this <source> login to it?" Confirm → link (standard behaviour); deny → abort
-with a support contact (no silent second account).
+**Design (decided 2026-08-10 — simple version for v1):** keep
+`user_matching_mode: email_link` on both sources — on a matching verified email the
+account is linked automatically and the user lands in it (spike-verified). The PRD's
+"explicit confirmation" is satisfied by a **compensating notification**: an Authentik
+event notification (email) on `source_linked`, so the account owner learns a new method
+was attached.
 
 - Both Google and GitHub only expose verified emails through these sources, so the match
-  signal is trustworthy; the confirmation is UX safety, not a security control.
-- Compensating control either way: Authentik event notification (email) on
-  `source_linked`, so the account owner learns a new method was attached.
-- **De-scope option (call it in review):** if the flow customization proves >1 day of work,
-  v1 ships plain `email_link` + the notification email, and the prompt stage becomes a
-  fast-follow. The risk accepted is a user linking without realizing they had an account.
+  signal is trustworthy; auto-link is safe as a security matter.
+- Risk consciously accepted: a user may link without realizing they already had an
+  account; the notification email is the recovery signal.
+- **Fast-follow (optional, not v1):** a prompt stage in the source-authentication flow
+  ("An account `<username>` with this email already exists. Link this login to it?") —
+  pure Authentik flow configuration, can be added later without breaking anything.
 
 ## Flow 2 — existing student → teacher (FR-2a)
 
@@ -157,11 +157,12 @@ keep as fallback if the claim approach hits a wall.
   code + Ops queue — is reusable for it).
 - Nostr anywhere in the IdP (stays Moodle-native).
 
-## Review checklist (approval = ENG-326 done)
+## Review checklist (approved 2026-08-10)
 
-- [ ] Flow 1: accept prompt-stage confirmation, or de-scope to `email_link` + notification?
-- [ ] Flow 2: email-code verification acceptable as the primary fallback?
+- [x] Flow 1: simple version — `email_link` auto-link + `source_linked` notification;
+      prompt-stage confirmation is an optional fast-follow.
+- [x] Flow 2: email-code verification as the primary fallback.
 - [x] Flow 2: Ops queue owner = Authentik admins group, via the `groups` claim
-      (decided 2026-08-10, spike-verified).
+      (spike-verified).
 - [x] Flow 3: GitHub connection as hard gate at submission time, transported as the
-      `github_id` claim (agreed + spike-verified 2026-08-10).
+      `github_id` claim (spike-verified).

@@ -80,6 +80,12 @@ already have a Moodle student account.
 4. **Residual fallback:** no email on the Moodle account (e.g. Nostr-only students) or
    verification impossible → the claim lands in an **Ops review queue**; Ops confirms
    out-of-band and links manually. Small volume makes this acceptable.
+   **Queue owner (decided 2026-08-10):** members of the Authentik **admins group** — the
+   `groups` claim ships in the default `profile` scope (spike-verified: akadmin's token
+   carries `groups: ["authentik Admins"]`), so the intranet maps that group to its Ops
+   role from the token alone, OIDC-only. If IdP administration and course-ops ever need
+   to diverge, introduce a dedicated Authentik group and map that instead — same
+   mechanism, no code change beyond the group name.
 5. No claim → new/no `moodle_user_id`; the loader (P101) creates or links the Moodle user
    at first publication. A later claim goes through the same steps from profile settings.
 
@@ -154,5 +160,8 @@ keep as fallback if the claim approach hits a wall.
 ## Review checklist (approval = ENG-326 done)
 
 - [ ] Flow 1: accept prompt-stage confirmation, or de-scope to `email_link` + notification?
-- [ ] Flow 2: email-code verification acceptable as the primary fallback? Ops queue owner?
-- [ ] Flow 3: agree GitHub connection is a hard gate at submission time (not at signup)?
+- [ ] Flow 2: email-code verification acceptable as the primary fallback?
+- [x] Flow 2: Ops queue owner = Authentik admins group, via the `groups` claim
+      (decided 2026-08-10, spike-verified).
+- [x] Flow 3: GitHub connection as hard gate at submission time, transported as the
+      `github_id` claim (agreed + spike-verified 2026-08-10).

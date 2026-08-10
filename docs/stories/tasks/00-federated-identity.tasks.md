@@ -15,10 +15,12 @@ status: draft
 
 ## Spike (do first)
 
-- [ ] Validate Authentik for the teachers/staff volume (deployment size, cost).
+- [x] Validate Authentik for the teachers/staff volume (deployment size, cost).
+      → ENG-325: ~880 MB RAM idle (full stack); 2 vCPU / 4 GB VPS suffices. See `spikes/authentik/`.
 - [ ] Connect Moodle 5.1 as an OAuth2 **core** client (config, not plugin); confirm the
       `/public` plugin move after upgrade doesn't break it.
-- [ ] Confirm a **stable 1:1 `sub`** across local / Google / GitHub on the same IdP account.
+- [x] Confirm a **stable 1:1 `sub`** across local / Google / GitHub on the same IdP account.
+      → ENG-325: verified 2026-08-10 with real id_tokens, same `sub` via the 3 methods.
 - [ ] Decide the student→teacher linking strategy + fallback when the identifier doesn't match.
 
 ## IdP setup

@@ -2,3 +2,5 @@
 data/
 certs/
 custom-templates/
+docker-compose.override.yml
+blueprints/
